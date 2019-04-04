@@ -9,35 +9,44 @@ jobs:
       # specify the version you desire here
       - image: snyk/snyk-cli:npm
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
     steps:
-      # Install snyk CLI 
+      # Install snyk CLI
       - run:
-      name: 'Update-snyk and snyk-to-html'
-      command: 'npm install -g snyk | npm install -g snyk-to-html'
+          name: 'Update-snyk and snyk-to-html'
+          command: 'npm install -g snyk | npm install -g snyk-to-html'
 
       - checkout
 
-      # Install goof dependencies - run:
-      name: build-goof command: 'npm install'
-      
-      # Snyk Test - run:
-      name: "Snyk Test breaking on high sev" command: |
-      snyk test --org=evkissle --json --severity-threshold=high > snyk_results.json
-      
+      # Install goof dependencies
+      - run:
+          name: build-goof
+          command: 'npm install'
+
+      # Snyk Test
+      - run:
+          name: "Snyk Test breaking on high sev"
+          command: |
+            snyk test --org=evkissle --json --severity-threshold=high > snyk_results.json
       # Snyk Monitor if snyk test passes (snyk test by default fails if any vulnerabilities are detected)
       - run:
-      name: "Snyk Monitor" command:
-      snyk monitor --org=evkissle
-      
-      # Always generate HTML report of Snyk test results - run:
-      name: Generate Snyk Test Results HTML Report
-      command: snyk-to-html -i snyk_results.json -o snyk_results.html when: always
+          name: "Snyk Monitor"
+          command:
+            snyk monitor --org=evkissle
+
+      # Always generate HTML report of Snyk test results
+      - run:
+          name: Generate Snyk Test Results HTML Report
+          command: snyk-to-html -i snyk_results.json -o snyk_results.html
+          when: always
+
       - store_artifacts:
-      path: snyk_results.html
+          path: snyk_results.html
+
+
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build:
+          context: SNYK
