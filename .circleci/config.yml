@@ -17,7 +17,8 @@ jobs:
     working_directory: ~/repo
 
     steps:
-      # Install snyk CLI - run:
+      # Install snyk CLI 
+      - run:
       name: 'Update-snyk and snyk-to-html'
       command: 'npm install -g snyk | npm install -g snyk-to-html'
 
